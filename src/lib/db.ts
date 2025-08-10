@@ -1,11 +1,11 @@
 import { MongoClient, Db, Collection } from 'mongodb';
 import { ProcessedMessage, User } from '@/types';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+if (!process.env.MONGODB_URL) {
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URL"');
 }
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URL;
 const options = {
   maxPoolSize: 10,
   serverSelectionTimeoutMS: 5000,
@@ -56,7 +56,7 @@ export async function createIndexes() {
   try {
     const messagesCollection = await getMessagesCollection();
     const usersCollection = await getUsersCollection();
-    
+
     // Create message indexes
     await messagesCollection.createIndexes([
       { key: { wa_id: 1, timestamp: -1 } },
@@ -64,13 +64,13 @@ export async function createIndexes() {
       { key: { createdAt: -1 } },
       { key: { timestamp: -1 } },
     ]);
-    
+
     // Create user indexes
     await usersCollection.createIndexes([
       { key: { phoneNumber: 1 }, unique: true },
       { key: { createdAt: -1 } },
     ]);
-    
+
     console.log('Database indexes created successfully');
   } catch (error) {
     console.error('Error creating database indexes:', error);
