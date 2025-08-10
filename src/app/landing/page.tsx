@@ -1,9 +1,45 @@
+
+"use client";
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageCircle, Users, Zap, Shield, Globe, BarChart3 } from 'lucide-react';
 
 export default function LandingPage() {
+  const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOpen(false);
+        router.push("/chat");
+      } else {
+        setError(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      setError("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-whatsapp-primary/10 via-background to-whatsapp-secondary/10">
       {/* Hero Section */}
@@ -13,22 +49,45 @@ export default function LandingPage() {
             <MessageCircle className="w-12 h-12 text-whatsapp-primary" />
             <h1 className="text-4xl font-bold text-foreground">WhatsApp Business</h1>
           </div>
-          
           <h2 className="text-5xl md:text-6xl font-bold text-foreground max-w-4xl leading-tight">
             Connect with your customers like never before
           </h2>
-          
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Professional WhatsApp Business dashboard to manage all your customer conversations, 
+            Professional WhatsApp Business dashboard to manage all your customer conversations,
             send messages, and grow your business with real-time messaging.
           </p>
-          
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link href="/login">
-              <Button size="lg" className="text-white px-8 py-4 text-lg hover:opacity-90" style={{ backgroundColor: '#25D366' }}>
-                Get Started
-              </Button>
-            </Link>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="text-white px-8 py-4 text-lg hover:opacity-90" style={{ backgroundColor: '#25D366' }}>
+                  Get Started
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Enter your phone number</DialogTitle>
+                  <DialogDescription>
+                    To get started, please enter your WhatsApp phone number.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <Input
+                    type="tel"
+                    placeholder="Phone number"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    required
+                    className="w-full"
+                  />
+                  {error && <div className="text-red-500 text-sm">{error}</div>}
+                  <DialogFooter>
+                    <Button type="submit" disabled={loading || !phone} className="w-full bg-whatsapp-primary text-white hover:opacity-90">
+                      {loading ? "Submitting..." : "Continue"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
             <Button variant="outline" size="lg" className="px-8 py-4 text-lg">
               Watch Demo
             </Button>
