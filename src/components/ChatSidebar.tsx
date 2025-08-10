@@ -19,11 +19,11 @@ interface ChatSidebarProps {
   isLoading?: boolean;
 }
 
-export default function ChatSidebar({ 
-  chats, 
-  selectedChatId, 
-  onChatSelect, 
-  isLoading = false 
+export default function ChatSidebar({
+  chats,
+  selectedChatId,
+  onChatSelect,
+  isLoading = false
 }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProfile, setSelectedProfile] = useState<Chat | null>(null);
@@ -33,13 +33,13 @@ export default function ChatSidebar({
     chat.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     chat.wa_id.includes(searchQuery)
   );
-  
+
   const handleProfileClick = (chat: Chat, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedProfile(chat);
     setIsProfileOpen(true);
   };
-  
+
   const closeProfile = () => {
     setIsProfileOpen(false);
     setSelectedProfile(null);
@@ -65,9 +65,9 @@ export default function ChatSidebar({
   }
 
   return (
-    <div className="w-full md:w-80 lg:w-96 border-r border-border bg-gradient-to-b from-green-50 to-white flex flex-col h-full">
+    <div className="w-full md:w-80 lg:w-96 border-r border-border bg-[#f0f2f5] flex flex-col h-full shadow-lg">
       {/* Header */}
-      <div className="p-4 lg:p-6 border-b border-border text-white bg-gradient-to-r from-green-600 to-green-700 shadow-lg">
+      <div className="p-4 lg:p-6 border-b border-border text-white bg-gradient-to-r from-green-600 to-green-700 shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -82,11 +82,11 @@ export default function ChatSidebar({
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-border">
+      <div className="p-3 border-b border-border bg-[#f6f6f6]">
         <input
           type="text"
-          placeholder="Search chats..."
-          className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-whatsapp-primary"
+          placeholder="Search or start new chat"
+          className="w-full px-3 py-2 bg-[#ececec] border border-[#ececec] rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-whatsapp-primary"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -94,73 +94,62 @@ export default function ChatSidebar({
 
       {/* Chat List */}
       <ScrollArea className="flex-1">
-        <div className="p-2">
+        <div className="p-1">
           {filteredChats.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               {searchQuery ? 'No chats found' : 'No conversations yet'}
             </div>
           ) : (
             filteredChats.map((chat) => (
-              <Card
+              <div
                 key={chat.wa_id}
                 className={cn(
-                  "mb-1 cursor-pointer transition-all duration-200 hover:bg-muted/50",
-                  selectedChatId === chat.wa_id && "bg-whatsapp-primary/10 border-whatsapp-primary"
+                  "flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all group hover:bg-[#e6e6e6]",
+                  selectedChatId === chat.wa_id && "bg-[#d9fdd3]"
                 )}
                 onClick={() => onChatSelect(chat.wa_id)}
               >
-                <CardContent className="p-4 border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Avatar 
-                        className="h-14 w-14 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-green-400 transition-all" 
-                        onClick={(e) => handleProfileClick(chat, e)}
-                      >
-                        <AvatarFallback className="text-white font-bold text-lg" style={{ backgroundColor: '#128C7E' }}>
-                          {chat.contactName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-base truncate text-gray-900">
-                          {chat.contactName}
-                        </h3>
-                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2 font-medium">
-                          {formatTime(chat.lastMessageTime)}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-gray-600 truncate leading-relaxed">
-                          {chat.lastMessage}
-                        </p>
-                        
-                        {chat.unreadCount > 0 && (
-                          <Badge 
-                            variant="default" 
-                            className="text-white ml-2 h-6 w-6 rounded-full text-xs font-bold flex items-center justify-center shadow-lg"
-                            style={{ backgroundColor: '#25D366' }}
-                          >
-                            {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <div className="text-xs text-gray-400 font-medium">
-                        +91 {chat.wa_id}
-                      </div>
-                    </div>
+                <div className="relative">
+                  <Avatar
+                    className="h-12 w-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-green-400 transition-all"
+                    onClick={(e) => handleProfileClick(chat, e)}
+                  >
+                    <AvatarFallback className="text-white font-bold text-lg" style={{ backgroundColor: '#128C7E' }}>
+                      {chat.contactName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-[15px] truncate text-gray-900">
+                      {chat.contactName}
+                    </h3>
+                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2 font-medium">
+                      {formatTime(chat.lastMessageTime)}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[13px] text-gray-600 truncate leading-relaxed max-w-[120px]">
+                      {chat.lastMessage}
+                    </p>
+                    {chat.unreadCount > 0 && (
+                      <Badge
+                        variant="default"
+                        className="text-white ml-2 h-5 w-5 rounded-full text-xs font-bold flex items-center justify-center shadow-lg"
+                        style={{ backgroundColor: '#25D366' }}
+                      >
+                        {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))
           )}
         </div>
       </ScrollArea>
-      
+
       {/* Profile Modal */}
       <Dialog open={isProfileOpen} onOpenChange={closeProfile}>
         <DialogContent className="sm:max-w-md">
@@ -181,7 +170,7 @@ export default function ChatSidebar({
                   </DialogTitle>
                 </div>
               </DialogHeader>
-              
+
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                   <div className="flex items-center space-x-3">
@@ -192,7 +181,7 @@ export default function ChatSidebar({
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                   <div className="flex items-center space-x-3">
                     <MessageCircle className="w-5 h-5 text-blue-600" />
@@ -203,7 +192,7 @@ export default function ChatSidebar({
                     </div>
                   </div>
                 </div>
-                
+
                 {selectedProfile.unreadCount > 0 && (
                   <div className="bg-green-50 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
@@ -217,9 +206,9 @@ export default function ChatSidebar({
                     </div>
                   </div>
                 )}
-                
+
                 <div className="flex space-x-3">
-                  <Button 
+                  <Button
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => {
                       onChatSelect(selectedProfile.wa_id);
